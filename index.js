@@ -2,7 +2,7 @@ import chokidar from "chokidar";
 import fs from "fs";
 import path from "path";
 import Seven from "node-7z";
-import Unrar from "unrar";
+import unrar from "@zhangfuxing/unrar";
 import ConsoleStamp from "console-stamp";
 
 ConsoleStamp(console);
@@ -38,33 +38,33 @@ chokidar.watch(watchDirectory).on("add", async (filePath) => {
 
     if (exists) return;
 
-    const logEnd = () =>
-      console.log(`Succesfully unzipped ${filePath} to ${extractedFolder}`);
-    const logProgress = (progress) =>
-      console.log(`Extracting progress: ${progress.percent}%`);
-    const logData = (data) =>
+    const logProgressZip = (progress) =>
+      console.log(`Extracting ${filePath} progress: ${progress.percent}%`);
+    const logDataZip = (data) =>
       console.log(`Extracted data: ${data.file}: ${data.status}`);
+
+    const logProgressRar = (percent) => {
+      console.log(`Extracting ${filePath} progress: ${percent}`);
+    };
+
+    const logEnd = () =>
+      console.log(`Succesfully extracted ${filePath} to ${extractedFolder}`);
+    const logError = (error) => {
+      console.error(`Error while extracting ${filePath}: ${error}`);
+    };
 
     if (isRar) {
       console.log(`Extracting archive using unrar`);
       fs.mkdirSync(extractedFolder);
-      const archive = new Unrar(filePath);
-      archive.list((err, entries) => {
-        for (let entry of entries) {
-          const stream = archive.stream(entry.name);
-          stream.on("error", (e) => {
-            console.error(`Error while extracting ${filePath}: ${e}`);
-          });
-          stream.on("end", (e) => {
-            console.log(
-              `Succesfully extracted ${entry.name}to ${extractedFolder}`
-            );
-          });
-          stream.pipe(
-            fs.createWriteStream(path.join(extractedFolder, entry.name))
-          );
-        }
-      });
+
+      unrar.on("progress", logProgressRar);
+      unrar
+        .uncompress({
+          src: filePath,
+          dest: extractedFolder,
+          command: "e",
+        })
+        .then(logEnd, logError);
     } else if (isZip) {
       console.log(`Extracting archive using 7zip`);
       try {
@@ -72,10 +72,10 @@ chokidar.watch(watchDirectory).on("add", async (filePath) => {
           $progress: true,
         });
         stream.on("end", logEnd);
-        stream.on("progress", logProgress);
-        stream.on("data", logData);
+        stream.on("progress", logProgressZip);
+        stream.on("data", logDataZip);
       } catch (e) {
-        console.error(`Error while extracting ${filePath}: ${e}`);
+        logError(e);
       }
     }
   }
