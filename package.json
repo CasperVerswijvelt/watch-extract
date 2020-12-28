@@ -1,0 +1,26 @@
+{
+  "name": "watch-unarchive",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CasperVerswijvelt/watch-unarchive.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CasperVerswijvelt/watch-unarchive/issues"
+  },
+  "homepage": "https://github.com/CasperVerswijvelt/watch-unarchive#readme",
+  "dependencies": {
+    "chokidar": "^3.4.3",
+    "console-stamp": "^0.2.9",
+    "node-7z": "^2.1.2",
+    "unrar": "^0.2.0"
+  }
+}
