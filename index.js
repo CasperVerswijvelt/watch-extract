@@ -50,11 +50,6 @@ chokidar.watch(watchDirectory).on("add", async (filePath) => {
     // If extracted folder already exists, return
     if (exists) return;
 
-    const logProgressZip = (progress) =>
-      console.log(`Extracting ${filePath} progress: ${progress.percent}%`);
-    const logDataZip = (data) =>
-      console.log(`Extracted data: ${data.file}: ${data.status}`);
-
     const logEnd = () =>
       console.log(`Succesfully extracted ${filePath} to ${extractedFolder}`);
     const logError = (error) => {
