@@ -2,7 +2,7 @@ import chokidar from "chokidar";
 import fs from "fs";
 import path from "path";
 import Seven from "node-7z";
-import unrar from "@zhangfuxing/unrar";
+import unrar from "node-unrar-js";
 import ConsoleStamp from "console-stamp";
 
 ConsoleStamp(console);
@@ -57,14 +57,17 @@ chokidar.watch(watchDirectory).on("add", async (filePath) => {
       console.log(`Extracting archive using unrar`);
       fs.mkdirSync(extractedFolder);
 
-      unrar.on("progress", logProgressRar);
-      unrar
-        .uncompress({
-          src: filePath,
-          dest: extractedFolder,
-          command: "e",
-        })
-        .then(logEnd, logError);
+      const extractor = unrar.createExtractorFromFile(
+        filePath,
+        extractedFolder
+      );
+
+      const extractResult = extractor.extractAll();
+      if (extractResult[0].state === "ERROR") {
+        logError(extractResult[0].reason);
+      } else {
+        logEnd();
+      }
     } else if (isZip) {
       console.log(`Extracting archive using 7zip`);
       try {
