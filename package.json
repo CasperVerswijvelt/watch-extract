@@ -20,7 +20,7 @@
   "dependencies": {
     "chokidar": "^3.4.3",
     "console-stamp": "^0.2.9",
-    "node-7z": "^2.1.2",
+    "extract-zip": "^2.0.1",
     "node-unrar-js": "^0.8.1"
   }
 }
