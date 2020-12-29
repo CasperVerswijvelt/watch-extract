@@ -15,7 +15,6 @@ import decompressTargz from "decompress-targz";
 import decompressTarxz from "decompress-tarxz";
 import decompressUnzip from "decompress-unzip";
 import unrar from "node-unrar-js";
-import { Console } from "console";
 
 // Process arguments
 
