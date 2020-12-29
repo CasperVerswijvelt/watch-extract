@@ -6,6 +6,7 @@ A simple nodejs application that watches a specific folder for added files and e
 
 - Make sure Node version 12.10.0 or later is installed
 - Clone this repository
+- Nagivate into repository folder and run `npm install`
 - Done!
 
 ## Usage
@@ -23,6 +24,12 @@ If all is well you should see this printed:
 By default the application will watch for new files in the current folder (`.`) and extract to a folder named `extracted` that is created in the same directory as the found archive. This behaviour can be changed by passing these optional parameters:
 
     node index.js --path downloads --extractFolder unarchived
+
+## Run as systemd service on Linux
+
+- Copy the [watch-extract.service](watch-extract.service) file to `/etc/system/system/` folder
+- Edit the capitalized parts to fit your setup
+- Run `sudo systemctl enable watch-extract` and `sudo systemctl start watch-extract`
 
 ## Notes
 
