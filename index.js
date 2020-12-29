@@ -1,6 +1,9 @@
 import chokidar from "chokidar";
 import fs from "fs";
 import path from "path";
+import yargs from "yargs";
+
+// Unarchiving libraries
 
 import decompress from "decompress";
 import decompressBzip2 from "decompress-bzip2";
@@ -12,19 +15,25 @@ import decompressTargz from "decompress-targz";
 import decompressTarxz from "decompress-tarxz";
 import decompressUnzip from "decompress-unzip";
 import unrar from "node-unrar-js";
+import { Console } from "console";
 
 // Process arguments
 
-const args = process.argv.slice(2);
+const argv = yargs(process.argv)
+  .help()
+  .alias("h", "help")
+  .alias("p", "path")
+  .alias("e", "extractFolder")
+  .describe("p", "Path to watch for added files in. Defaults to '.'.")
+  .describe("e", "Name of folder to extract to. Defaults to 'extracted'.")
+  .default("path", ".")
+  .default("extractFolder", "extracted").argv;
 
-// Directory to watch, default to current directory
-let watchDirectory = ".";
-if (args.length > 0 && typeof args[0] === "string") watchDirectory = args[0];
+// Directory to watch
+let watchDirectory = argv.path;
 
-// Name of folder to extract to, default to 'extracted'
-let extractedFolderName = "extracted";
-if (args.length > 1 && typeof args[1] === "string")
-  extractedFolderName = args[1];
+// Name of folder to extract to
+let extractedFolderName = argv.extractFolder;
 
 // Filetypes
 
@@ -44,6 +53,7 @@ const FILE_EXTENSION = {
 };
 
 // Watch added files
+console.log(`Watching directory '${watchDirectory}' for added files`);
 chokidar.watch(watchDirectory).on("add", onFileAdded);
 
 async function onFileAdded(filePath) {
