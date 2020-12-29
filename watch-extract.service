@@ -1,0 +1,13 @@
+[Unit]
+Description=Watches a folder and extracts added archive files
+Documentation=https://github.com/CasperVerswijvelt/watch-extract
+
+[Service]
+Type=simple
+User=YOUR_USER
+Group=YOUR_GROUP
+ExecStart=/usr/bin/node PATH_TO_REPO/watch-extract/index.js --path PATH_TO_WATCH
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
