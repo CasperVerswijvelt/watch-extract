@@ -51,6 +51,8 @@ const FILE_EXTENSION = {
   CRX: ".crx",
 };
 
+const PARTIAL = ".partial"
+
 // Watch added files
 console.log(`Watching directory '${watchDirectory}' for added files`);
 chokidar.watch(watchDirectory).on("add", onFileAdded);
@@ -71,8 +73,7 @@ async function onFileAdded(filePath) {
 
   console.log(`Found supported archive file ${filePath}`);
   console.log(
-    `Extracted folder ${
-      exists ? "already exists, ignoring" : "does not exist yet"
+    `Extracted folder ${exists ? "already exists, ignoring" : "does not exist yet"
     }`
   );
 
@@ -86,6 +87,17 @@ async function onFileAdded(filePath) {
     console.error(`Removing '${extractedFolder}' folder`);
     fs.rmdirSync(extractedFolder, { recursive: true });
   };
+  const onDecompressExtracted = (files) => {
+    for (let file of files) {
+
+      const fullPath = path.join(extractedFolder, file.path)
+
+      if (fullPath.endsWith(PARTIAL))
+        fs.renameSync(fullPath, fullPath.slice(0, fullPath.length - PARTIAL.length))
+    }
+
+    onSuccess()
+  }
 
   // Make sure extracted folder is created before extracting
   fs.mkdirSync(extractedFolder);
@@ -130,13 +142,18 @@ async function onFileAdded(filePath) {
     }
 
     try {
-      await decompress(filePath, extractedFolder, {
+      const files = await decompress(filePath, extractedFolder, {
         plugins: [decompressPlugin],
+        map: file => {
+          file.path = `${file.path}${PARTIAL}`
+          return file
+        },
         // Undocumented extra inputfile parameter needed for decompressGz
         //  See: https://github.com/CarlosCarmona/decompress-gz/issues/1
         inputFile: filePath,
       });
-      onSuccess();
+
+      onDecompressExtracted(files);
     } catch (e) {
       onError(e);
     }
