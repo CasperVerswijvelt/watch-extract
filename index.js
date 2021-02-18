@@ -87,10 +87,10 @@ async function onFileAdded(filePath) {
     console.error(`Removing '${extractedFolder}' folder`);
     fs.rmdirSync(extractedFolder, { recursive: true });
   };
-  const onDecompressExtracted = (files) => {
+  const onExtracted = (files) => {
     for (let file of files) {
 
-      const fullPath = path.join(extractedFolder, file.path)
+      const fullPath = path.join(extractedFolder, file)
 
       if (fullPath.endsWith(PARTIAL))
         fs.renameSync(fullPath, fullPath.slice(0, fullPath.length - PARTIAL.length))
@@ -108,14 +108,24 @@ async function onFileAdded(filePath) {
   if (fileExtension === FILE_EXTENSION.RAR) {
     // Use 'node-unrar-js' library for '.rar' files
 
-    const extractor = unrar.createExtractorFromFile(filePath, extractedFolder);
+    const extractor = await unrar.createExtractorFromFile({
+      filepath: filePath,
+      targetPath: extractedFolder,
+      filenameTransform: (fileName) => `${fileName}${PARTIAL}`
+    });
+    const files = [...extractor.getFileList().fileHeaders].map(fileHeader => fileHeader.name)
 
-    const extractResult = extractor.extractAll();
-    if (extractResult[0].state === "ERROR") {
-      onError(extractResult[0].reason);
-    } else {
-      onSuccess();
+    try {
+      const extracted = extractor.extract({
+        files: files
+      });
+
+      const extractedFiles = [...extracted.files]
+      onExtracted(extractedFiles.map(extractedFile => extractedFile.fileHeader.name + PARTIAL))
+    } catch (e) {
+      onError(e)
     }
+    
   } else {
     // Use 'decompress' library for other supported files
 
@@ -153,7 +163,7 @@ async function onFileAdded(filePath) {
         inputFile: filePath,
       });
 
-      onDecompressExtracted(files);
+      onExtracted(files.map(file => file.path));
     } catch (e) {
       onError(e);
     }
