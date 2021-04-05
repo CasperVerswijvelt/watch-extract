@@ -1,4 +1,7 @@
-FROM node:15
+FROM node:15-alpine
+
+# couchbase sdk requirements
+RUN apk update && apk add python make g++ && rm -rf /var/cache/apk/*
 
 # Create app directory
 WORKDIR /usr/src/app
