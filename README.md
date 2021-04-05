@@ -31,6 +31,35 @@ By default the application will watch for new files in the current folder (`.`) 
 - Edit the capitalized parts to fit your setup
 - Run `sudo systemctl enable watch-extract` and `sudo systemctl start watch-extract`
 
+## Run trough Docker
+
+### Docker Compose
+
+```
+version: "3.8"
+
+services:
+  watch-extract:
+    image: casperverswijvelt/watch-extract
+    container_name: watch-extract
+    environment:
+      - WATCH_PATH=/watch
+    volumes: 
+      - /path/to/watch/folder:/watch
+    restart: unless-stopped
+```
+
+### Docker CLI
+
+```
+docker run -d \
+  --name=watch-extract \
+  -e WATCH_PATH=/watch \
+  -v /path/to/watch/folder:/watch \
+  --restart unless-stopped \
+  casperverswijvelt/watch-extract
+```
+
 ## Notes
 
 - Currently only a single archive within one folder level is extracted.
