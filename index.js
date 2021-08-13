@@ -90,10 +90,17 @@ async function onFileAdded(filePath) {
   const onExtracted = (files) => {
     for (let file of files) {
 
-      const fullPath = path.join(extractedFolder, file)
+      const fullPath = path.join(extractedFolder, file);
+      let chmodPath = fullPath;
 
-      if (fullPath.endsWith(PARTIAL))
-        fs.renameSync(fullPath, fullPath.slice(0, fullPath.length - PARTIAL.length))
+      if (fullPath.endsWith(PARTIAL)) {
+
+        const newFilename = fullPath.slice(0, fullPath.length - PARTIAL.length);
+        chmodPath = newFilename;
+        fs.renameSync(fullPath, newFilename);
+      }
+
+      fs.chmodSync(chmodPath, '777');
     }
 
     onSuccess()
@@ -101,6 +108,8 @@ async function onFileAdded(filePath) {
 
   // Make sure extracted folder is created before extracting
   fs.mkdirSync(extractedFolder);
+
+  fs.chmodSync(extractedFolder, '777');
 
   console.log(`Extracting ${fileExtension} archive`);
 
