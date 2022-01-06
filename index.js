@@ -71,14 +71,10 @@ async function onFileAdded(filePath) {
   const extractedFolder = path.join(parentFolder, extractedFolderName);
   const exists = fs.existsSync(extractedFolder);
 
-  console.log(`Found supported archive file ${filePath}`);
-  console.log(
-    `Extracted folder ${exists ? "already exists, ignoring" : "does not exist yet"
-    }`
-  );
-
   // If extracted folder already exists, return
   if (exists) return;
+
+  console.log(`Found supported non-extracted archive file '${filePath}'`);
 
   const onSuccess = () =>
     console.log(`Succesfully extracted ${filePath} to ${extractedFolder}`);
